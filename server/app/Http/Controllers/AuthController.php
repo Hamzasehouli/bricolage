@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\NotificationController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -80,17 +79,15 @@ class AuthController extends Controller
     public function forgetPassword(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|min:10|max:10',
+            'email' => 'required|email',
         ]);
 
         $user = User::where('email', $validated['email'])->first();
 
         if (!$user) {
-            return response(['status' => 'fail', 'message' => 'No user found with this phone number'], 400);
+            return response(['status' => 'fail', 'message' => 'No user found with this email'], 404);
         }
-
-        $notif = new NotificationController();
-        $notif->sendSmsNotificaition('0623839627', 'hi moh');
+        echo ('mm');
     }
 
     /**
