@@ -17,16 +17,20 @@ class AuthController extends Controller
     public function signup(Request $request)
     {
         $validated = $request->validate([
-            'fullname' => 'required',
+            'fullname' => ['bail', 'required'],
+            'email' => 'required|min:10|unique:users|email',
             'tel' => 'required|min:10|max:10|unique:users',
             'password' => 'min:8',
         ]);
 
         $user = User::create([
             'fullname' => $validated['fullname'],
+            'email' => $validated['email'],
             'tel' => $validated['tel'],
             'password' => Hash::make($validated['password']),
         ]);
+
+        $user->tokens()->delete();
 
         $token = $user->createToken('myToken')->plainTextToken;
 
@@ -41,14 +45,17 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validated = $request->validate([
-            'tel' => 'required|min:10|max:10',
+            'email' => 'required|email',
             'password' => 'min:8',
         ]);
 
-        $user = User::where('tel', $validated['tel'])->first();
+        $user = User::where('email', $validated['email'])->first();
 
         if (!$user) {
-            return response(['status' => 'fail', 'message' => 'No user found with this phone number'], 400);
+            return response(['status' => 'fail', 'message' => 'No user found with this email'], 404);
+            // throw ValidationException::withMessages([
+            //     'email' => ['The provided credentials are incorrect.'],
+            // ]);
         }
 
         $isPasswordValid = Hash::check($validated['password'], $user->password);
@@ -56,6 +63,8 @@ class AuthController extends Controller
         if (!$isPasswordValid) {
             return response(['status' => 'fail', 'message' => 'The entered Password is incorrect'], 400);
         }
+
+        $user->tokens()->delete();
 
         $token = $user->createToken('myToken')->plainTextToken;
 
@@ -71,10 +80,10 @@ class AuthController extends Controller
     public function forgetPassword(Request $request)
     {
         $validated = $request->validate([
-            'tel' => 'required|min:10|max:10',
+            'email' => 'required|min:10|max:10',
         ]);
 
-        $user = User::where('tel', $validated['tel'])->first();
+        $user = User::where('email', $validated['email'])->first();
 
         if (!$user) {
             return response(['status' => 'fail', 'message' => 'No user found with this phone number'], 400);

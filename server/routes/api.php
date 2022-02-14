@@ -18,4 +18,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/forget-password', [AuthController::class, 'forgetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/auth/kaka', function () {
+        echo ('ll');
+    });
 });
