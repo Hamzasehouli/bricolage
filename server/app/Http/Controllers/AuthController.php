@@ -6,6 +6,7 @@ use App\Mail\ForgetPasswordEmail;
 use App\Mail\RegisterEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
@@ -13,10 +14,10 @@ use Illuminate\Support\Facades\Password;
 class AuthController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware(['guest']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware(['guest']);
+    // }
     /**
      * Display a listing of the resource.
      *
@@ -161,9 +162,9 @@ class AuthController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function updatepasssword(Request $request)
     {
-        //
+        dd('mm');
     }
 
     /**
@@ -173,9 +174,23 @@ class AuthController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function updatedata(Request $request)
     {
-        //
+
+        if ($request->password) {
+            return response([
+                'status' => 'fail',
+                'message' => 'If you want to update the password, please use the appropriate route',
+            ], 403);
+        }
+        $request->validate(['email' => 'email', 'tel' => 'min:10,max:10']);
+        Auth::user()->update($request->only('email', 'fullname', 'tel'));
+        return response([
+            'status' => 'success',
+            'data' => [
+                'user' => Auth::user(),
+            ],
+        ], 200);
     }
 
     /**
