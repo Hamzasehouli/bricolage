@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ForgetPasswordEmail;
+use App\Mail\RegisterEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -32,6 +35,7 @@ class AuthController extends Controller
         $user->tokens()->delete();
 
         $token = $user->createToken('myToken')->plainTextToken;
+        Mail::to($user)->send(new RegisterEmail());
 
         return response(['status' => 'success', 'data' => ['user' => $user], 'token' => $token], 201);
     }
@@ -87,7 +91,9 @@ class AuthController extends Controller
         if (!$user) {
             return response(['status' => 'fail', 'message' => 'No user found with this email'], 404);
         }
-        echo ('mm');
+
+        Mail::to($user)->send(new ForgetPasswordEmail());
+
     }
 
     /**
