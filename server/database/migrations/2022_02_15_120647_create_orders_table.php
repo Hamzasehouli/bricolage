@@ -19,9 +19,10 @@ class CreateOrdersTable extends Migration
             $table->string('fullname');
             $table->string('photo')->nullable();
             $table->string('tel');
-            $table->boolean('active');
-            $table->boolean('archived');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['plumber', 'carpenter', 'air-conditionair', 'electrician']);
+            $table->boolean('active')->default(true);
+            $table->boolean('archived')->default(false);
+            $table->foreignId('user_id')->nullable()->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderEmail;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -14,7 +16,14 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $orders = Order::all();
+        return response([
+            'status' => 'success',
+            'data' => [
+                'results' => $orders->count(),
+                'orders' => $orders,
+            ],
+        ], 200);
     }
 
     /**
@@ -22,9 +31,24 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+
+    public function store(Request $request)
     {
-        //
+
+        $validated = $request->validate(['tel' => 'bail|required',
+            'description' => 'required', 'photo' => 'string',
+            'fullname' => 'required|string', 'type' => 'required|string']);
+
+        // $user = User::where('tel', $validated['tel']);
+
+        $order = Order::create($request->only('tel', 'fullname', 'description', 'type', 'photo'));
+
+        Mail::to('kaka@test.com')->send(new OrderEmail(tel:$order['tel'], fullname:$order['fullname'], description:$order['description'], type:$order['type'], created_at:$order['created_at'], photo:$order['photo']));
+        return response([
+            'status' => 'success',
+            'message' => 'Order has been created successfully',
+        ], 201);
+
     }
 
     /**
@@ -33,7 +57,7 @@ class OrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function create(Request $request)
     {
         //
     }

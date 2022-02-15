@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,7 +21,20 @@ Route::post('/auth/forget-password', [AuthController::class, 'forgetPassword'])-
 Route::post('/auth/reset-password/{token}', [AuthController::class, 'resetpassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    /////////AUTH
+
     Route::patch('/auth/update-data', [AuthController::class, 'updatedata']);
     Route::delete('/auth/logout', [AuthController::class, 'logout']);
     Route::patch('/auth/update-password', [AuthController::class, 'updatepassword']);
+
+    ////////Order
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::delete('/orders/{order}', [OrderController::class, 'destory']);
+    Route::patch('/orders/{order}', [OrderController::class, 'update']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+
 });
+
+Route::post('/orders', [OrderController::class, 'store']);
