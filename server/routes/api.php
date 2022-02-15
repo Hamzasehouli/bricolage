@@ -13,9 +13,10 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
  */
-Route::post('/auth/signup', [AuthController::class, 'signup']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/forget-password', [AuthController::class, 'forgetPassword']);
+Route::post('/auth/signup', [AuthController::class, 'signup'])->name('signup');
+Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
+Route::post('/auth/forget-password', [AuthController::class, 'forgetPassword'])->name('forgetpassword');
+Route::post('/auth/reset-password/{token}', [AuthController::class, 'resetpassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/kaka', function () {

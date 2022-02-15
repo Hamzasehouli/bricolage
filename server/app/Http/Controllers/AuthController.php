@@ -8,9 +8,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware(['guest']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -83,16 +89,29 @@ class AuthController extends Controller
     public function forgetPassword(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email',
+            'email' => ['required', 'email', 'string'],
         ]);
 
         $user = User::where('email', $validated['email'])->first();
 
         if (!$user) {
-            return response(['status' => 'fail', 'message' => 'No user found with this email'], 404);
+            return response(['status' => 'fail', 'message' => 'No user found or password is incorrect'], 404);
+            exit;
         }
 
-        Mail::to($user)->send(new ForgetPasswordEmail());
+        $token = bin2hex(random_bytes(16));
+        $user->resettoken = $token;
+        $user->resettokencreatedat = time();
+        $user->save();
+
+        $link = "http://localhost:8000/api/auth/resetpassword/$token";
+
+        Mail::to($user)->send(new ForgetPasswordEmail($link));
+
+        return response([
+            'status' => 'success',
+            'message' => 'Email sent successfully successfully',
+        ], 200);
 
     }
 
@@ -102,9 +121,38 @@ class AuthController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+
+    public function resetpassword($token, Request $request)
     {
-        //
+
+        $user = User::where('resettoken', $token)->first();
+
+        if (!$user) {
+            return response(['status' => 'fail', 'message' => 'No user found or password is incorrect'], 404);
+            exit;
+        }
+
+        if (($user->resettokencreatedat + 10 * 60) < time()) {
+            $user->resettoken = '';
+            $user->resettokencreatedat = '';
+            $user->save();
+            return response(['status' => 'fail', 'message' => 'Link has expired, please try again'], 400);
+        }
+
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8'],
+            'confirmPassword' => ['required', 'string', 'min:8'],
+        ]);
+
+        if ($validated['password'] !== $validated['confirmPassword']) {
+            return response(['status' => 'fail', 'message' => 'Please confirm your password'], 400);
+        }
+
+        $user->update(['password' => Hash::make($validated['password']), 'resettoken' => '', 'resettokencreatedat' => '']);
+        return response([
+            'status' => 'success',
+            'message' => 'Password has been reset successfully',
+        ], 200);
     }
 
     /**

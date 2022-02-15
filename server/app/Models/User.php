@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'active',
         'role',
+        'resettoken',
+        'resettokencreatedat',
     ];
 
     /**
