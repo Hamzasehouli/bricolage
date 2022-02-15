@@ -21,6 +21,6 @@ Route::post('/auth/reset-password/{token}', [AuthController::class, 'resetpasswo
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/auth/update-data', [AuthController::class, 'updatedata']);
-
+    Route::delete('/auth/logout', [AuthController::class, 'logout']);
     Route::patch('/auth/update-password', [AuthController::class, 'updatepassword']);
 });

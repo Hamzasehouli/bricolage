@@ -162,9 +162,36 @@ class AuthController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updatepasssword(Request $request)
+    public function updatepassword(Request $request)
     {
-        dd('mm');
+        $request->validate([
+            'oldpassword' => 'bail|required|min:8',
+            'newpassword' => 'required|min:8',
+            'confirmpassword' => 'required|min:8',
+        ]);
+
+        if ($request->newpassword !== $request->confirmpassword) {
+            return response([
+                'status' => 'fail',
+                'message' => 'Password and confirmed one do not match',
+            ], 400);
+        }
+
+        $isPasswordValid = Hash::check($request->oldpassword, Auth::user()->password);
+
+        if (!$isPasswordValid) {
+            return response([
+                'status' => 'fail',
+                'message' => 'The current password is not valid',
+            ], 400);
+        }
+
+        Auth::user()->update(['password' => Hash::make($request->newpassword)]);
+        return response([
+            'status' => 'success',
+            'message' => 'Password has been reset successfully',
+        ], 200);
+
     }
 
     /**
@@ -199,8 +226,12 @@ class AuthController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function logout()
     {
-        //
+        Auth::user()->tokens()->delete();
+        return response([
+            'status' => 'success',
+            'message' => 'You have logged out successfully',
+        ], 200);
     }
 }
