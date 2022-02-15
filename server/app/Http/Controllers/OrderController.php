@@ -44,6 +44,7 @@ class OrderController extends Controller
         $order = Order::create($request->only('tel', 'fullname', 'description', 'type', 'photo'));
 
         Mail::to('kaka@test.com')->send(new OrderEmail(tel:$order['tel'], fullname:$order['fullname'], description:$order['description'], type:$order['type'], created_at:$order['created_at'], photo:$order['photo']));
+
         return response([
             'status' => 'success',
             'message' => 'Order has been created successfully',
