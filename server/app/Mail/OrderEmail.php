@@ -37,6 +37,7 @@ class OrderEmail extends Mailable
      */
     public function build()
     {
+
         return $this->view('emails.orderemail')->with([
             'fullname' => $this->fullname,
             'created_at' => $this->created_at,

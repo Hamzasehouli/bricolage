@@ -12,7 +12,7 @@
     <p>tel: {{$tel}}</p>
     <p>description: {{$description}}</p>
     @if ($photo)
-    <p>photo: {{$photo}}</p>
+    <img style="width: 150px" src="{{ asset('images/'.$photo) }}" alt="problem photo">
     @endif
 </body>
 </html>

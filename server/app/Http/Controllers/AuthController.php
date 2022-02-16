@@ -24,6 +24,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function signup(Request $request)
     {
         $validated = $request->validate([
@@ -39,10 +40,11 @@ class AuthController extends Controller
             'tel' => $validated['tel'],
             'password' => Hash::make($validated['password']),
         ]);
-
         $user->tokens()->delete();
 
         $token = $user->createToken('myToken')->plainTextToken;
+        $user->save();
+
         Mail::to($user)->send(new RegisterEmail());
 
         return response(['status' => 'success', 'data' => ['user' => $user], 'token' => $token], 201);
@@ -53,6 +55,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function login(Request $request)
     {
         $validated = $request->validate([

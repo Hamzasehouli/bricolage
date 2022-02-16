@@ -37,4 +37,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
+Route::get('/delete-image/{image}', [OrderController::class, 'deleteImage'])->name('delete-image');
+
 Route::post('/orders', [OrderController::class, 'store']);

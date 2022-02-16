@@ -35,15 +35,40 @@ class OrderController extends Controller
     public function store(Request $request)
     {
 
-        $validated = $request->validate(['tel' => 'bail|required',
-            'description' => 'required', 'photo' => 'string',
+        $request->validate(['tel' => 'bail|required',
+            'description' => 'required', 'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'fullname' => 'required|string', 'type' => 'required|string']);
 
         // $user = User::where('tel', $validated['tel']);
 
-        $order = Order::create($request->only('tel', 'fullname', 'description', 'type', 'photo'));
+        // $token = explode(' ', $request->header('Authorization'))[1];
+        // return User::where('id', 1)->first();
 
-        Mail::to('kaka@test.com')->send(new OrderEmail(tel:$order['tel'], fullname:$order['fullname'], description:$order['description'], type:$order['type'], created_at:$order['created_at'], photo:$order['photo']));
+        // exit;
+        // $order = Order::create($request->only('tel', 'fullname', 'description', 'type', 'photo'));
+        // $path = $request->file('photo')->store('orders');
+        // echo $path;
+        // exit;
+
+        function path($num)
+        {
+            $str = 'azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXVBN1234567890';
+            $strLng = strlen($str);
+            $path = '';
+            for ($i = 0; $i < $num; $i++) {
+                $randomNumber = rand(0, $strLng);
+                $path .= $str[$randomNumber];
+            }
+            return $path;
+        }
+        $path = path(20);
+
+        $imageName = time() . '-' . $path . '.' . $request->photo->extension();
+        $request->photo->move(public_path('images'), $imageName);
+
+        Mail::to('sss@test.com')->send(new OrderEmail(photo:$imageName, tel:$request['tel'], fullname:$request['fullname'], description:$request['description'], type:$request['type'], created_at:now()));
+        // File::delete('images/' . $imageName);
+        // return redirect()->route('delete-image', ['image' => $imageName]);
 
         return response([
             'status' => 'success',
@@ -103,8 +128,13 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function deleteImage($image)
     {
-        //
+        // File::delete('images/' . $image);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Order has been created successfully',
+        ], 201);
     }
 }
