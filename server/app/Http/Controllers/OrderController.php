@@ -36,7 +36,7 @@ class OrderController extends Controller
     {
 
         $request->validate(['tel' => 'bail|required',
-            'description' => 'required', 'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => '', 'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'fullname' => 'required|string', 'type' => 'required|string']);
 
         // $user = User::where('tel', $validated['tel']);
@@ -56,7 +56,7 @@ class OrderController extends Controller
             $strLng = strlen($str);
             $path = '';
             for ($i = 0; $i < $num; $i++) {
-                $randomNumber = rand(0, $strLng);
+                $randomNumber = rand(0, $strLng - 1);
                 $path .= $str[$randomNumber];
             }
             return $path;
@@ -66,7 +66,8 @@ class OrderController extends Controller
         $imageName = time() . '-' . $path . '.' . $request->photo->extension();
         $request->photo->move(public_path('images'), $imageName);
 
-        Mail::to('sss@test.com')->send(new OrderEmail(photo:$imageName, tel:$request['tel'], fullname:$request['fullname'], description:$request['description'], type:$request['type'], created_at:now()));
+        Mail::to('team@fixup.com')->send(new OrderEmail(photo:$imageName, tel:$request['tel'], fullname:$request['fullname'], description:$request['description'], type:$request['type'], created_at:now()));
+
         // File::delete('images/' . $imageName);
         // return redirect()->route('delete-image', ['image' => $imageName]);
 

@@ -6,13 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
-<body>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">
     <p>Added at: {{$created_at}}</p>
     <p>Fullname: {{$fullname}}</p>
-    <p>tel: {{$tel}}</p>
-    <p>description: {{$description}}</p>
+    <p>Tel: {{$tel}}</p>
+    <p>Description: {{$description}}</p>
     @if ($photo)
-    <img style="width: 150px" src="{{ asset('images/'.$photo) }}" alt="problem photo">
+    <img style="width: 500px;object-fit:cover" src="{{ asset('images/'.$photo) }}" alt="problem photo">
     @endif
 </body>
 </html>

@@ -15,9 +15,9 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->string('fullname');
-            $table->string('photo')->nullable();
+            $table->string('photo');
             $table->string('tel');
             $table->enum('type', ['plumber', 'carpenter', 'air-conditionair', 'electrician']);
             $table->boolean('active')->default(true);

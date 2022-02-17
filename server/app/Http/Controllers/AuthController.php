@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ForgetPasswordEmail;
-use App\Mail\RegisterEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,7 +44,7 @@ class AuthController extends Controller
         $token = $user->createToken('myToken')->plainTextToken;
         $user->save();
 
-        Mail::to($user)->send(new RegisterEmail());
+        // Mail::to($user)->send(new RegisterEmail());
 
         return response(['status' => 'success', 'data' => ['user' => $user], 'token' => $token], 201);
     }
@@ -94,7 +93,7 @@ class AuthController extends Controller
     public function forgetPassword(Request $request)
     {
         $validated = $request->validate([
-            'email' => ['required', 'email', 'string'],
+            'email' => ['required', 'email'],
         ]);
 
         $user = User::where('email', $validated['email'])->first();
